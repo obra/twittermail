@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+        use Net::Twitter;
+use warnings;
+use strict;
+use Email::Simple;
+        my $user     = 'obra';
+        my $password = 'MYPASSWORD';
+        my $nt       = Net::Twitter->new(
+            traits   => [qw/API::REST/],
+            username => $user,
+            password => $password
+        );
+my $msg = join("",<STDIN>);
+my $mime = Email::Simple->new($msg);
+die "No message found" unless ($mime->header('Subject'));
+my $rep = $mime->header('In-Reply-To') || '';
+$rep =~ s/^<(.*)@.*$/$1/;
+           $nt->update({ status => $mime->header('Subject'), in_reply_to_status_id => $rep});
+exit 0;

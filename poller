@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+        use Net::Twitter;
+use warnings;
+use strict;
+use Email::MIME;
+use Email::MIME::Creator;
+        my $user     = shift @ARGV;
+        my $password = shift @ARGV;
+        my $nt       = Net::Twitter->new(
+            traits   => [qw/API::REST/],
+            username => $user,
+            password => $password
+        );
+
+        my $last = 1;
+while (1) {
+        eval {
+            my $statuses = $nt->friends_timeline( { since_id => $last, count => 100 } );
+            for my $status (@$statuses) {
+                $last = $status->{id} if $status->{id} > $last;
+                my $date = $status->{created_at};
+                $date =~ s/ (..:..:.. [\-\+]\d+) (\d{4})$/ $2 $1/g;
+                $date =~ s/^(\w{3}) (\w{3}) (\d{2})/$1, $3 $2 /g;
+            warn "DATE $date";
+                my $email = Email::MIME->create(
+                    attributes => {
+                        content_type => "text/plain",
+                        disposition  => "inline",
+                        charset      => "utf-8",
+                    },
+                    header => [
+                        From          => $status->{user}->{name} . " <" . $status->{user}{screen_name} . "\@twitter>",
+                        Subject       => $status->{text},
+                        Date          => $date,
+                        'Message-Id'  => "<".$status->{id} . "\@twitter>",
+                        'In-Reply-To' => ($status->{in_reply_to_status_id} ? "<".$status->{in_reply_to_status_id}.'@twitter>' : '')
+                    ],
+                    body => YAML::Dump($status)
+                );
+                use YAML;
+                open(my $file, ">", "/Users/jesse/mail/twitter/INBOX/cur/".$status->{id});
+                print $file $email->as_string;
+                close $file;
+            warn "Loaded ".$status->{id};
+            }
+        };
+        warn "$@\n" if $@;
+        sleep 120;
+    }
