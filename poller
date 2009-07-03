@@ -6,6 +6,7 @@ use Email::MIME;
 use Email::MIME::Creator;
         my $user     = shift @ARGV;
         my $password = shift @ARGV;
+        my $maildir = shift @ARGV;
         my $nt       = Net::Twitter->new(
             traits   => [qw/API::REST/],
             username => $user,
@@ -38,7 +39,7 @@ while (1) {
                     body => YAML::Dump($status)
                 );
                 use YAML;
-                open(my $file, ">", "/Users/jesse/mail/twitter/INBOX/cur/".$status->{id});
+                open(my $file, ">", $maildir."/cur/".$status->{id});
                 print $file $email->as_string;
                 close $file;
             warn "Loaded ".$status->{id};
