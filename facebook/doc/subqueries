@@ -1,0 +1,14 @@
+Although after a point, you'll start hitting resource limits.  You
+            can do a 'LIMIT X OFFSET Y' (maybe unsure on the syntax there) to
+            avoid that.
+			Oh.  I've happily got code that gets back a set of status updates
+            for a person, and then looks at all the comments on them.
+It involved a bit of trickery... one sec.
+        SELECT fromid, text, username
+        FROM comment
+        WHERE post_id IN (
+            SELECT concat('%friend%_', status_id)
+            FROM status
+            WHERE uid = '%friend%'
+
+
