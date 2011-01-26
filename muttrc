@@ -1,0 +1,2 @@
+set spoolfile=imap://jesse:foo@localhost/Facebook
+set ssl_verify_host=no
