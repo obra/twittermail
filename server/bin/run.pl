@@ -7,5 +7,5 @@ Stream::Server::Server->new(
     model_class => "Stream::Server::Model",
     user        => 'nobody',
     port        => 143,
-    ssl_port    => 993
+    #ssl_port    => 993
 )->run();
